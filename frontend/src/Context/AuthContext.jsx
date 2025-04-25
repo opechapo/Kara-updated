@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useAccount, useDisconnect } from "wagmi";
-import { fetchWithRetry } from "../utils/api";
 
 export const AuthContext = createContext({
   isAuthenticated: false,
@@ -10,11 +9,14 @@ export const AuthContext = createContext({
   cartCount: 0,
   notificationCount: 0,
   nonce: null,
-  fetchNonce: async () => {},
-  fetchUserProfile: async () => {},
-  fetchCartCount: async () => {},
-  fetchNotificationCount: async () => {},
-  logout: () => {},
+  fetchNonce: async () => { },
+  fetchUserProfile: async () => { },
+  fetchCartCount: async () => { },
+  fetchNotificationCount: async () => { },
+  logout: () => { },
+  setIsAuthenticated: async (value) => { },
+  setToken: async (value) => { },
+  setWalletAddress: async (value) => { }
 });
 
 export const AuthProvider = ({ children }) => {
@@ -44,38 +46,38 @@ export const AuthProvider = ({ children }) => {
   };
 
   const fetchNonce = useCallback(async (walletAddress, force = false) => {
-    if (!walletAddress) return null;
+    // if (!walletAddress) return null;
 
-    const cacheKey = `nonce_${walletAddress}`;
-    if (
-      !force &&
-      cache[cacheKey] &&
-      Date.now() - cache.lastFetched[cacheKey] < 5 * 60 * 1000
-    ) {
-      setNonce(cache[cacheKey]);
-      return cache[cacheKey];
-    }
+    // const cacheKey = `nonce_${walletAddress}`;
+    // if (
+    //   !force &&
+    //   cache[cacheKey] &&
+    //   Date.now() - cache.lastFetched[cacheKey] < 5 * 60 * 1000
+    // ) {
+    //   setNonce(cache[cacheKey]);
+    //   return cache[cacheKey];
+    // }
 
-    try {
-      console.log(`Fetching nonce for address: ${walletAddress}`);
-      const response = await fetchWithRetry(
-        `http://localhost:3000/user/nonce/${walletAddress}`,
-        { method: "GET" }
-      );
-      const data = await response.json();
-      const fetchedNonce = data.data.nonce;
-      if (!fetchedNonce) {
-        throw new Error("Invalid nonce received");
-      }
-      cache[cacheKey] = fetchedNonce;
-      cache.lastFetched[cacheKey] = Date.now();
-      setNonce(fetchedNonce);
-      console.log("Nonce retrieved:", fetchedNonce);
-      return fetchedNonce;
-    } catch (error) {
-      console.error("Error fetching nonce:", error.message);
-      throw error;
-    }
+    // try {
+    //   console.log(`Fetching nonce for address: ${walletAddress}`);
+    //   const response = await fetch(
+    //     `http://localhost:3000/user/nonce/${walletAddress}`,
+    //     { method: "GET" }
+    //   );
+    //   const data = await response.json();
+    //   const fetchedNonce = data.data.nonce;
+    //   if (!fetchedNonce) {
+    //     throw new Error("Invalid nonce received");
+    //   }
+    //   cache[cacheKey] = fetchedNonce;
+    //   cache.lastFetched[cacheKey] = Date.now();
+    //   setNonce(fetchedNonce);
+    //   console.log("Nonce retrieved:", fetchedNonce);
+    //   return fetchedNonce;
+    // } catch (error) {
+    //   console.error("Error fetching nonce:", error.message);
+    //   throw error;
+    // }
   }, []);
 
   const fetchUserProfile = useCallback(async (force = false) => {
@@ -94,7 +96,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetchWithRetry(
+      const response = await fetch(
         "http://localhost:3000/user/profile",
         { method: "GET" }
       );
@@ -133,7 +135,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetchWithRetry("http://localhost:3000/cart", {
+      const response = await fetch("http://localhost:3000/cart", {
         method: "GET",
       });
       const data = await response.json();
@@ -171,7 +173,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetchWithRetry(
+      const response = await fetch(
         "http://localhost:3000/notifications/count",
         { method: "GET" }
       );
@@ -216,6 +218,20 @@ export const AuthProvider = ({ children }) => {
     cache.nonce = null;
   }, [disconnect]);
 
+  // Implement the setter functions that were only defined in the context
+  const updateToken = useCallback(async (newToken) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+  }, []);
+
+  const updateWalletAddress = useCallback(async (address) => {
+    setWalletAddress(address);
+  }, []);
+
+  const updateIsAuthenticated = useCallback(async (value) => {
+    setIsAuthenticated(value);
+  }, []);
+
   // Check and synchronize wallet connection status
   useEffect(() => {
     if (!isConnected && isAuthenticated) {
@@ -254,6 +270,9 @@ export const AuthProvider = ({ children }) => {
         fetchCartCount,
         fetchNotificationCount,
         logout,
+        setIsAuthenticated: updateIsAuthenticated,
+        setToken: updateToken,
+        setWalletAddress: updateWalletAddress
       }}
     >
       {children}

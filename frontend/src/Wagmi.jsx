@@ -137,8 +137,8 @@ const InnerWagmiConfig = ({ children }) => {
 
   return (
     <RainbowKitAuthenticationProvider
-      adapter={authenticationAdapter}
-      status={walletAuthStatus}
+    // adapter={authenticationAdapter}
+    // status={walletAuthStatus}
     >
       <RainbowKitProvider modalSize="compact">
         {children}

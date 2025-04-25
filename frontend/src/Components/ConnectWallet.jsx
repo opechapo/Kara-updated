@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useAccount, useSignMessage, useDisconnect } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { SiweMessage } from "siwe";
-import { fetchWithRetry } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 
@@ -21,7 +20,7 @@ export const ConnectWallet = () => {
     try {
       console.log(`Authenticating wallet for address: ${address}`);
       // Fetch nonce
-      const nonceResponse = await fetchWithRetry(
+      const nonceResponse = await fetch(
         `http://localhost:3000/user/nonce/${address}`,
         { method: "GET" }
       );
@@ -32,15 +31,19 @@ export const ConnectWallet = () => {
       }
       console.log("Nonce retrieved:", nonce);
 
-      // Create SIWE message
+      // Create SIWE message - Fixed structure
       const siweMessage = new SiweMessage({
         domain: window.location.host,
-        address,
+        address: address,
+        statement: 'Allow me connect.',
         uri: window.location.origin,
         version: "1",
         chainId: 84532,
-        nonce,
+        nonce: nonce,
+        issuedAt: new Date().toISOString()
       });
+
+      // Prepare message correctly
       const message = siweMessage.prepareMessage();
       console.log("SIWE message prepared:", message);
 
@@ -48,8 +51,8 @@ export const ConnectWallet = () => {
       const signature = await signMessageAsync({ message });
       console.log("Signature:", signature);
 
-      // Send to backend
-      const connectResponse = await fetchWithRetry(
+      // Send to backend - Fixed to send proper format
+      const connectResponse = await fetch(
         "http://localhost:3000/user/connect-wallet",
         {
           method: "POST",
@@ -57,12 +60,13 @@ export const ConnectWallet = () => {
           body: JSON.stringify({
             walletAddress: address,
             signature,
-            message: siweMessage,
+            message: message, // Send the prepared message string, not the siweMessage object
           }),
         }
       );
 
       const data = await connectResponse.json();
+
       if (!data.success) {
         throw new Error(data.error || "Failed to authenticate wallet");
       }
@@ -73,18 +77,22 @@ export const ConnectWallet = () => {
         setToken(data.data.token);
         setWalletAddress(address);
         console.log("Authentication successful, token:", data.data.token);
-        navigate("/profile");
+        return;
       } else {
         throw new Error("No token received from server");
       }
     } catch (err) {
       console.error("Authentication error:", err);
       let userError = "Failed to authenticate wallet. Please try again.";
-      if (err.message.includes("User rejected request")) {
+
+      if (err.message?.includes("User rejected request")) {
         userError = "Signature cancelled. Please approve the signature.";
-      } else if (err.message.includes("Cannot read properties of null")) {
+      } else if (err.message?.includes("Cannot read properties of null")) {
         userError = "Wallet signing failed. Please ensure MetaMask is on Base Sepolia.";
+      } else if (err.message?.includes("preparing message")) {
+        userError = "Error preparing message. Please check your connection and try again.";
       }
+
       setErrorMessage(userError);
       disconnect();
     }
@@ -95,6 +103,11 @@ export const ConnectWallet = () => {
       handleAuthentication();
     }
   }, [isConnected, address, isAuthenticated]);
+
+  // Clear error message when connection state changes
+  useEffect(() => {
+    setErrorMessage("");
+  }, [isConnected]);
 
   return (
     <div style={{ textAlign: "center", marginTop: "20px" }}>

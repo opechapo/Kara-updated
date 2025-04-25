@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, memo } from "react";
+import { useAccount, useSignMessage, useDisconnect } from "wagmi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoMdNotifications, IoMdCart } from "react-icons/io";
 import { FaBars, FaUser, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
@@ -16,17 +17,26 @@ const navItems = [
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { 
-    isAuthenticated, 
-    isAdmin, 
-    walletAddress, 
-    cartCount, 
-    notificationCount, 
+  const {
+    isAuthenticated,
+    isAdmin,
+    walletAddress,
+    cartCount,
+    notificationCount,
     logout,
     fetchCartCount,
-    fetchNotificationCount
+    fetchNotificationCount,
+    setIsAuthenticated
   } = useAuth();
-  
+
+  const { isConnected } = useAccount()
+
+  useEffect(() => {
+    setIsAuthenticated(isConnected)
+  }, [isConnected])
+
+  console.log(isConnected);
+
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [emailInput, setEmailInput] = useState("");
@@ -42,7 +52,7 @@ const Header = () => {
     try {
       const response = await fetch(
         "http://localhost:3000/api/categories",
-        { 
+        {
           method: "GET",
           credentials: "include"
         }
@@ -95,12 +105,12 @@ const Header = () => {
   }, []);
 
   const handleCartClick = useCallback(() => navigate("/cart"), [navigate]);
-  
+
   const handleNotificationsClick = useCallback(
     () => navigate("/notifications"),
     [navigate]
   );
-  
+
   const handleSearchSubmit = useCallback(
     (e) => {
       e.preventDefault();
@@ -156,11 +166,10 @@ const Header = () => {
             <Link
               key={index}
               to={link}
-              className={`text-lg font-medium text-gray-700 hover:text-purple-600 transition ${
-                location.pathname === link
-                  ? "text-purple-700 font-semibold"
-                  : ""
-              }`}
+              className={`text-lg font-medium text-gray-700 hover:text-purple-600 transition ${location.pathname === link
+                ? "text-purple-700 font-semibold"
+                : ""
+                }`}
             >
               {title}
             </Link>
@@ -187,13 +196,13 @@ const Header = () => {
         </div>
         <div className="flex items-center space-x-4 text-xl text-gray-700 ml-6">
           <ConnectWallet />
-          
+
           {errorMessage && (
             <span className="text-red-500 text-sm ml-2" role="alert">
               {errorMessage}
             </span>
           )}
-          
+
           {isAuthenticated && (
             <>
               <div
@@ -217,17 +226,17 @@ const Header = () => {
                       <FaUserCircle className="mr-2" />
                       {isAdmin ? "Admin Profile" : "Profile"}
                     </Link>
-                    <button
+                    {/* <button
                       onClick={logout}
                       className="flex items-center w-full text-left px-4 py-2 text-gray-700 hover:bg-purple-100"
                     >
                       <FaSignOutAlt className="mr-2" />
                       Logout
-                    </button>
+                    </button> */}
                   </div>
                 )}
               </div>
-              
+
               <button
                 onClick={handleNotificationsClick}
                 className="relative hover:text-purple-600 cursor-pointer transition"
@@ -239,7 +248,7 @@ const Header = () => {
                   {notificationCount}
                 </span>
               </button>
-              
+
               <button
                 onClick={handleCartClick}
                 className="relative hover:text-purple-600 cursor-pointer transition"
@@ -255,7 +264,7 @@ const Header = () => {
           )}
         </div>
       </nav>
-      
+
       {isEmailModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
