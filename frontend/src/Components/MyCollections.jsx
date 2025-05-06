@@ -12,6 +12,7 @@ const MyCollections = () => {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [closeTimeout, setCloseTimeout] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     console.log('Collection ID from URL:', collectionId);
@@ -35,11 +36,13 @@ const MyCollections = () => {
       }
       const data = await response.json();
       console.log('Collections: Parsed data:', data);
-      const collectionData = data.success ? data.data : data;
+      const collectionData = data.data; // Access normalized data field
       setCollection(collectionData);
+      setLoading(false);
     } catch (err) {
       console.error('Collections: Fetch error:', err.message);
       setError(err.message);
+      setLoading(false);
     }
   };
 
@@ -104,7 +107,7 @@ const MyCollections = () => {
     }
     const normalizedPath = imagePath.toLowerCase().startsWith('/uploads/')
       ? imagePath
-      : `/Uploads/${imagePath}`;
+      : `/uploads/${imagePath}`;
     const url = `http://localhost:3000${normalizedPath}`;
     console.log('Generated image URL:', url);
     return url;
@@ -154,10 +157,12 @@ const MyCollections = () => {
 
         {error ? (
           <div className="text-red-500 p-6 text-center text-lg">{error}</div>
-        ) : !collection ? (
+        ) : loading ? (
           <div className="p-6 w-full flex justify-center items-center min-h-screen">
             <FaSpinner className="animate-spin text-purple-900 text-4xl" />
           </div>
+        ) : !collection ? (
+          <div className="text-red-500 p-6 text-center text-lg">Collection not found</div>
         ) : (
           <div className="max-w-5xl mx-auto mt-20 p-6">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">{collection.name}</h2>

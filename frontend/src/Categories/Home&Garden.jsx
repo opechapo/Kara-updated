@@ -61,18 +61,18 @@ const HomeGardens = () => {
       <div className="flex min-h-screen px-6 py-4 pt-24">
         {/* Sidebar */}
         <div className="w-1/4 min-h-screen border-r border-gray-300">
-          {/* <CategorySideBar /> */}
+          <CategorySideBar />
         </div>
 
         {/* Category Content */}
         <div className="w-3/4 px-10 pt-4">
           <h2 className="text-3xl font-bold text-gray-800 mb-6">{displayCategory}</h2>
-          <div className="flex overflow-x-auto space-x-6 pb-4 cursor-pointer scrollbar-hide">
+          <div className="grid grid-cols-3 gap-6">
             {products.length > 0 ? (
               products.slice(0, 5).map((item) => (
                 <Link to={`/product/${item._id}`} key={item._id} className="hover:scale-105 transition-transform">
-                  <div className="min-w-[250px]">
-                    <div className="w-60 h-60 bg-gray-100 rounded-lg overflow-hidden">
+                  <div>
+                    <div className="w-full h-60 bg-gray-100 rounded-lg overflow-hidden">
                       <img
                         src={getImageUrl(item.generalImage)}
                         alt={item.name}

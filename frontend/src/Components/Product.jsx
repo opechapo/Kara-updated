@@ -454,14 +454,14 @@ const Product = () => {
                   onClick={initiateEscrow}
                   className="flex-1 bg-purple-900 text-white py-2 rounded-lg text-center font-semibold cursor-pointer"
                 >
-                  Deal
+                  Buy
                 </button>
-                <button
+                {/* <button
                   onClick={() => setChatOpen(true)}
                   className="bg-gray-300 p-3 rounded-lg cursor-pointer hover:bg-gray-400 transition"
                 >
                   <FaComments size={20} />
-                </button>
+                </button> */}
                 <button
                   onClick={addToCart}
                   className="bg-gray-300 p-3 rounded-lg cursor-pointer hover:bg-gray-400 transition"

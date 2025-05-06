@@ -126,6 +126,7 @@ router.post(
       } else {
         throw new Error('Product image or store featured image required');
       }
+      
     }
     const product = await createProduct(req, res, productData);
     res.status(201).json({ success: true, data: product });

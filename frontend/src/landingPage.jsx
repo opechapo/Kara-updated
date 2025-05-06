@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
-import { FaSpinner } from 'react-icons/fa';
+import { FaSpinner, FaShoppingCart } from 'react-icons/fa';
 import Header from './Layouts/Header';
 import Footer from './Layouts/Footer';
 import Categories5 from './assets/Categories5.png';
@@ -9,6 +9,16 @@ import Categories2 from './assets/Categories2.png';
 import Categories3 from './assets/Categories3.png';
 import Categories4 from './assets/Categories4.png';
 import Categories1 from './assets/Categories1.png';
+import { useAuth } from './context/AuthContext'; // Import useAuth for cart/notification updates
+
+// Define category routes (same as Header.jsx)
+const categoryLinks = [
+  { name: 'Electronics', link: '/electronics' },
+  { name: 'Smartphones & Tablets', link: '/smartphonestabs' },
+  { name: 'Home & Garden', link: '/homeandgarden' },
+  { name: 'Fashion', link: '/fashion' },
+  { name: 'Vehicles', link: '/vehicles' },
+];
 
 const LandingPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -19,12 +29,15 @@ const LandingPage = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState(null);
+  const [clickedItems, setClickedItems] = useState({});
+  const { fetchCartCount, fetchNotificationCount } = useAuth(); // For cart updates
 
   const API_BASE_URL = 'http://localhost:3000';
-  const POLLING_INTERVAL = 30000; // Poll every 30 seconds
+  const POLLING_INTERVAL = 30000;
 
   const getImageUrl = (path) => {
-    const fallbackImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==';
+    const fallbackImage =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==';
     return path ? `${API_BASE_URL}${path}` : fallbackImage;
   };
 
@@ -33,13 +46,12 @@ const LandingPage = () => {
     if (!token) return;
     try {
       const response = await fetch(`${API_BASE_URL}/user/profile`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },
         credentials: 'include',
       });
       const data = await response.json();
       if (response.ok && data._id) {
         setUserId(data._id);
-        console.log('Fetched user ID:', data._id);
       } else {
         console.warn('Failed to fetch user profile:', data.error);
       }
@@ -51,13 +63,12 @@ const LandingPage = () => {
   const fetchStores = async () => {
     const token = localStorage.getItem('token');
     try {
-      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const response = await fetch(`${API_BASE_URL}/stores/public/all`, {
         headers,
         credentials: 'include',
       });
       const data = await response.json();
-      console.log('Stores Data:', data);
       if (data.success) {
         setStores(data.data || []);
       } else {
@@ -104,16 +115,11 @@ const LandingPage = () => {
     };
 
     try {
-      // Fetch User Profile
       await fetchUserProfile();
-
-      // Fetch Stores
       await fetchStores();
 
-      // Fetch Latest Products
       try {
         const latestProductsData = await fetchWithRetry(`${API_BASE_URL}/products/public/latest`);
-        console.log('Latest Products Data:', latestProductsData);
         if (latestProductsData.success) {
           setLatestProducts(latestProductsData.data || []);
         } else {
@@ -125,22 +131,13 @@ const LandingPage = () => {
         setLatestProducts([]);
       }
 
-      // Fetch Categories
       try {
-        const categoriesData = await fetchWithRetry(`${API_BASE_URL}/products/public/categories`);
-        console.log('Categories Data:', categoriesData);
+        const categoriesData = await fetchWithRetry(`${API_BASE_URL}/api/categories`);
         if (categoriesData.success) {
-          // Map fetched categories to include correct links
           const mappedCategories = (categoriesData.data || []).map((category, index) => {
-            const categoryLinks = [
-              { name: 'Electronics', link: '/electronics' },
-              { name: 'Smartphones & Tablets', link: '/smartphonestabs' },
-              { name: 'Home & Garden', link: '/homeandgarden' },
-              { name: 'Fashion', link: '/fashion' },
-              { name: 'Vehicles', link: '/vehicles' },
-            ];
-            // Match by name or use index as fallback
-            const matchedCategory = categoryLinks.find((c) => c.name.toLowerCase() === category.name?.toLowerCase()) || categoryLinks[index % categoryLinks.length];
+            const matchedCategory =
+              categoryLinks.find((c) => c.name.toLowerCase() === category.name?.toLowerCase()) ||
+              categoryLinks[index % categoryLinks.length];
             return {
               ...category,
               link: matchedCategory.link,
@@ -156,12 +153,10 @@ const LandingPage = () => {
         setCategories([]);
       }
 
-      // Fetch Home & Garden Items
       try {
         const homeGardenData = await fetchWithRetry(
           `${API_BASE_URL}/products/public?category=${encodeURIComponent('Homes & Gardens')}`
         );
-        console.log('Home & Garden Data:', homeGardenData);
         if (homeGardenData.success) {
           setHomeGardenItems(homeGardenData.data || []);
         } else {
@@ -180,12 +175,41 @@ const LandingPage = () => {
     }
   };
 
+  const addToCart = async (productId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Please connect your wallet to add items to cart.');
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE_URL}/cart/add`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ productId, quantity: 1 }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to add to cart');
+      setClickedItems((prev) => ({ ...prev, [productId]: true }));
+      setTimeout(() => {
+        setClickedItems((prev) => ({ ...prev, [productId]: false }));
+      }, 1000);
+      fetchCartCount(true); // Update cart count
+      fetchNotificationCount(true); // Update notification count
+      alert('Item added to cart!');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   useEffect(() => {
     fetchData();
-    // Set up polling for stores
     const intervalId = setInterval(fetchStores, POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [fetchCartCount, fetchNotificationCount]);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % stores.length);
@@ -195,15 +219,10 @@ const LandingPage = () => {
     setCurrentIndex((prevIndex) => (prevIndex === 0 ? stores.length - 1 : prevIndex - 1));
   };
 
-  const categoryBanners = [
-    Categories5,
-    Categories2,
-    Categories3,
-    Categories4,
-    Categories1,
-  ];
+  const categoryBanners = [Categories5, Categories2, Categories3, Categories4, Categories1];
 
-  if (error) return <div className="text-red-500 p-6 w-full text-center text-lg">{error}</div>;
+  if (error)
+    return <div className="text-red-500 p-6 w-full text-center text-lg">{error}</div>;
   if (isLoading) {
     return (
       <div className="p-6 w-full flex justify-center items-center min-h-screen">
@@ -215,7 +234,6 @@ const LandingPage = () => {
   return (
     <>
       <Header />
-
       {/* Full-Screen Image Slider */}
       {stores.length > 0 ? (
         <section className="relative w-full h-screen">
@@ -259,44 +277,59 @@ const LandingPage = () => {
           <p className="text-gray-600 text-xl">No stores available to display.</p>
         </section>
       )}
-
       {/* New Arrivals Section */}
       <section className="container mx-auto my-12 px-6">
         <h2 className="text-3xl font-bold text-left text-gray-800 mb-6">New Arrivals</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        <div className="flex overflow-x-auto space-x-6 pb-4 cursor-pointer scrollbar-hide">
           {latestProducts.length > 0 ? (
             latestProducts.slice(0, 5).map((item) => (
-              <Link to={`/product/${item._id}`} key={item._id} className="hover:scale-105 transition-transform">
-                <div className="w-full">
-                  <div className="w-full h-60 bg-gray-100 rounded-lg overflow-hidden">
+              <div key={item._id} className="min-w-[250px]">
+                <Link to={`/product/${item._id}`} className="hover:scale-105 transition-transform">
+                  <div className="w-60 h-60 bg-gray-100 rounded-lg overflow-hidden">
                     <img
                       src={getImageUrl(item.generalImage)}
                       alt={item.name || 'Product image'}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="bg-white p-4 shadow-md rounded-lg mt-2">
+                </Link>
+                <div className="bg-white p-4 shadow-md rounded-lg mt-2 flex items-center justify-between">
+                  <div>
                     <p className="text-lg font-semibold text-gray-900">
                       {item.price} {item.paymentToken}
                     </p>
                     <p className="text-sm text-gray-600 truncate">{item.shortDescription}</p>
                   </div>
+                  <button
+                    onClick={() => addToCart(item._id)}
+                    className={`p-2 rounded-full transition-colors ${
+                      clickedItems[item._id]
+                        ? 'text-purple-500'
+                        : 'text-purple-300 hover:text-purple-700'
+                    }`}
+                    title="Add to Cart"
+                  >
+                    <FaShoppingCart size={20} />
+                  </button>
                 </div>
-              </Link>
+              </div>
             ))
           ) : (
-            <p className="text-gray-600 col-span-full">No new arrivals available.</p>
+            <p className="text-gray-600">No new arrivals available.</p>
           )}
         </div>
       </section>
-
       {/* Categories Section */}
       <section className="container mx-auto my-12 px-6">
         <h2 className="text-3xl font-bold text-left text-gray-800 mb-6">Categories</h2>
         <div className="flex overflow-x-auto space-x-6 pb-4 cursor-pointer scrollbar-hide">
           {categories.length > 0 ? (
             categories.map((category, index) => (
-              <Link to={category.link} key={index} className="hover:scale-105 transition-transform">
+              <Link
+                to={category.link}
+                key={index}
+                className="hover:scale-105 transition-transform"
+              >
                 <div className="min-w-[250px]">
                   <div className="w-60 h-60 bg-gray-100 rounded-lg overflow-hidden">
                     <img
@@ -316,15 +349,14 @@ const LandingPage = () => {
           )}
         </div>
       </section>
-
       {/* Homes & Gardens Section */}
       <section className="container mx-auto my-12 px-6">
         <h2 className="text-3xl font-bold text-left text-gray-800 mb-6">Homes & Gardens</h2>
         <div className="flex overflow-x-auto space-x-6 pb-4 cursor-pointer scrollbar-hide">
           {homeGardenItems.length > 0 ? (
             homeGardenItems.slice(0, 5).map((item) => (
-              <Link to={`/product/${item._id}`} key={item._id} className="hover:scale-105 transition-transform">
-                <div className="min-w-[250px]">
+              <div key={item._id} className="min-w-[250px]">
+                <Link to={`/product/${item._id}`} className="hover:scale-105 transition-transform">
                   <div className="w-60 h-60 bg-gray-100 rounded-lg overflow-hidden">
                     <img
                       src={getImageUrl(item.generalImage)}
@@ -332,19 +364,33 @@ const LandingPage = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="bg-white p-4 shadow-md rounded-lg mt-2">
-                    <p className="text-lg font-semibold text-gray-900">{item.price} {item.paymentToken}</p>
+                </Link>
+                <div className="bg-white p-4 shadow-md rounded-lg mt-2 flex items-center justify-between">
+                  <div>
+                    <p className="text-lg font-semibold text-gray-900">
+                      {item.price} {item.paymentToken}
+                    </p>
                     <p className="text-sm text-gray-600">{item.shortDescription}</p>
                   </div>
+                  <button
+                    onClick={() => addToCart(item._id)}
+                    className={`p-2 rounded-full transition-colors ${
+                      clickedItems[item._id]
+                        ? 'text-purple-500'
+                        : 'text-purple-300 hover:text-purple-700'
+                    }`}
+                    title="Add to Cart"
+                  >
+                    <FaShoppingCart size={20} />
+                  </button>
                 </div>
-              </Link>
+              </div>
             ))
           ) : (
             <p className="text-gray-600">No Homes & Gardens items available.</p>
           )}
         </div>
       </section>
-
       <Footer />
     </>
   );

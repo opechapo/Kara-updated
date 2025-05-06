@@ -17,6 +17,7 @@ const UpdateCollection = () => {
   const [stores, setStores] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchCollection();
@@ -27,6 +28,7 @@ const UpdateCollection = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Please connect your wallet.');
+      setLoading(false);
       return;
     }
     try {
@@ -37,18 +39,22 @@ const UpdateCollection = () => {
       const text = await response.text();
       console.log('UpdateCollection: Fetch collection raw response:', text);
       const data = JSON.parse(text);
-      if (!response.ok) throw new Error(data.message || 'Failed to fetch collection');
-      const collection = data.success ? data.data : data;
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch collection');
+      }
+      const collection = data.data; // Access normalized data field
       setCollectionData({
         name: collection.name || '',
         shortDescription: collection.shortDescription || '',
-        store: collection.store || '',
+        store: collection.store?._id || '',
         description: collection.description || '',
         generalImage: null,
       });
+      setLoading(false);
     } catch (err) {
       console.error('UpdateCollection: Fetch collection error:', err.message);
       setError(err.message);
+      setLoading(false);
     }
   };
 
@@ -66,8 +72,10 @@ const UpdateCollection = () => {
       const text = await response.text();
       console.log('UpdateCollection: Fetch stores raw response:', text);
       const data = JSON.parse(text);
-      if (!response.ok) throw new Error(data.message || 'Failed to fetch stores');
-      const storesData = data.success ? data.data : data;
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch stores');
+      }
+      const storesData = data.data; // Access normalized data field
       if (!Array.isArray(storesData)) {
         throw new Error('Stores data is not an array');
       }
@@ -164,7 +172,7 @@ const UpdateCollection = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-8">Update Collection</h1>
         {error && <div className="text-red-500 mb-8">{error}</div>}
         {success && <div className="text-green-500 mb-8">{success}</div>}
-        {!collectionData.name ? (
+        {loading ? (
           <div className="text-center py-10">
             <FaSpinner className="animate-spin text-purple-900 text-4xl" />
           </div>

@@ -3,10 +3,12 @@ const router = express.Router();
 const authMiddleware = require("../middleware/auth");
 const asyncHandler = require("express-async-handler");
 const {
+  getCollectionById,
   createCollection,
   updateCollection,
   deleteCollection,
 } = require("../controller/collectionController");
+
 const ProductCollection = require("../models/Collection");
 const mongoose = require("mongoose");
 
@@ -47,7 +49,11 @@ router.get('/public/:id', asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Collection not found");
   }
-  res.json({ success: true, data: collection });
+  const normalizedCollection = {
+    ...collection.toObject(),
+    generalImage: collection.generalImage ? collection.generalImage.replace('/uploads/', '') : null,
+  };
+  res.json({ success: true, data: normalizedCollection });
 }));
 
 // Authenticated routes
@@ -55,7 +61,11 @@ router.get('/', authMiddleware, asyncHandler(async (req, res) => {
   const collections = await ProductCollection.find({ owner: req.user._id })
     .populate('store', 'name')
     .populate('owner', 'walletAddress _id');
-  res.json({ success: true, data: collections });
+  const normalizedCollections = collections.map(collection => ({
+    ...collection.toObject(),
+    generalImage: collection.generalImage ? collection.generalImage.replace('/uploads/', '') : null,
+  }));
+  res.json({ success: true, data: normalizedCollections });
 }));
 
 router.get('/store/:storeId', authMiddleware, asyncHandler(async (req, res) => {
@@ -70,24 +80,14 @@ router.get('/store/:storeId', authMiddleware, asyncHandler(async (req, res) => {
   })
     .populate('store', 'name')
     .populate('owner', 'walletAddress _id');
-  res.json({ success: true, data: collections });
+  const normalizedCollections = collections.map(collection => ({
+    ...collection.toObject(),
+    generalImage: collection.generalImage ? collection.generalImage.replace('/uploads/', '') : null,
+  }));
+  res.json({ success: true, data: normalizedCollections });
 }));
 
-router.get('/:id', authMiddleware, asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  if (!isValidObjectId(id)) {
-    res.status(400);
-    throw new Error("Invalid collection ID");
-  }
-  const collection = await ProductCollection.findById(id)
-    .populate('store', 'name')
-    .populate('owner', 'walletAddress _id');
-  if (!collection || collection.owner.toString() !== req.user._id.toString()) {
-    res.status(403);
-    throw new Error("Collection not found or not authorized");
-  }
-  res.json({ success: true, data: collection });
-}));
+router.get('/:id', authMiddleware, getCollectionById);
 
 router.post("/", authMiddleware, createCollection);
 

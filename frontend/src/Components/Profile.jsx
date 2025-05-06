@@ -296,6 +296,35 @@ const Profile = () => {
     setActiveTab(tab);
   }, []);
 
+  const handleDeleteProduct = useCallback(async (productId) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Please connect your wallet.');
+      return;
+    }
+
+    try {
+      const response = await fetchWithRetry(`http://localhost:3000/products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Failed to delete product');
+
+      // Update state and cache
+      setProducts((prev) => prev.filter((product) => product._id !== productId));
+      cache.products = cache.products.filter((product) => product._id !== productId);
+      cache.lastFetched.products = Date.now();
+    } catch (err) {
+      console.error('Delete product error:', err.message);
+      setError(err.message);
+    }
+  }, []);
+
   const { ordersCreated, ordersReceived, lastAction } = useMemo(() => {
     const created = escrowTransactions.filter(
       (tx) => tx.buyerId?.toString() === user?._id?.toString()
@@ -373,7 +402,7 @@ const Profile = () => {
         {/* Left Section: User Info */}
         <div className="w-1/2 bg-white rounded-lg shadow-md p-6 ml-[-20px] border border-gray-200">
           <div className="flex flex-col items-center">
-            <div className="relative">
+            {/* <div className="relative">
               {isAvatarLoading ? (
                 <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
                   <span className="text-gray-500">Uploading...</span>
@@ -402,8 +431,8 @@ const Profile = () => {
                   className="hidden"
                 />
               </label>
-            </div>
-            <p className="text-gray-600 mt-2 italic">{user.email || 'No email provided'}</p>
+            </div> */}
+            {/* <p className="text-gray-600 mt-2 italic">{user.email || 'No email provided'}</p> */}
             <div className="flex items-center space-x-2 mt-2">
               <p className="text-gray-600 truncate max-w-xs font-mono">{user.walletAddress}</p>
               <button onClick={copyToClipboard} className="text-purple-900 hover:text-purple-700">
@@ -489,7 +518,8 @@ const Profile = () => {
               >
                 Store
               </Link>
-              <Link
+              {/* Uncomment if you want to enable these links */}
+              {/* <Link
                 to="/create-collection"
                 className="bg-transparent text-purple-900 px-4 py-2 rounded-md hover:bg-purple-100 transition-colors cursor-pointer"
               >
@@ -500,7 +530,7 @@ const Profile = () => {
                 className="bg-transparent text-purple-900 px-4 py-2 rounded-md hover:bg-purple-100 transition-colors cursor-pointer"
               >
                 Product
-              </Link>
+              </Link> */}
             </div>
           )}
 
@@ -589,12 +619,11 @@ const Profile = () => {
               (products.length > 0 ? (
                 <div className="grid grid-cols-3 md:grid-cols-2 gap-6">
                   {products.map((product) => (
-                    <div
-                      key={product._id}
-                      className="cursor-pointer group"
-                      onClick={() => navigate(`/product/${product._id}`)}
-                    >
-                      <div className="flex flex-col items-center">
+                    <div key={product._id} className="group">
+                      <div
+                        className="cursor-pointer flex flex-col items-center"
+                        onClick={() => navigate(`/product/${product._id}`)}
+                      >
                         {product.generalImage ? (
                           <img
                             src={`http://localhost:3000${product.generalImage}?t=${Date.now()}`}
@@ -616,6 +645,23 @@ const Profile = () => {
                         <p className="text-sm text-blue-600 font-semibold">
                           {product.price} {product.paymentToken}
                         </p>
+                      </div>
+                      <div className="mt-2 flex justify-center space-x-2">
+                        <Link
+                          to={`/update-product/${product._id}`}
+                          className="bg-purple-900 text-white px-3 py-1 rounded-md hover:bg-purple-700 transition-colors text-sm"
+                        >
+                          Update
+                        </Link>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent navigating to product page
+                            handleDeleteProduct(product._id);
+                          }}
+                          className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-500 transition-colors text-sm"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   ))}
