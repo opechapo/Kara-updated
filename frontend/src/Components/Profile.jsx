@@ -587,7 +587,7 @@ const Profile = () => {
                     <div
                       key={collection._id}
                       className="cursor-pointer group"
-                      onClick={() => navigate(`/my-collections/${collection._id}`)}
+                      onClick={() => navigate(`/collections/${collection._id}`)}
                     >
                       <div className="flex flex-col items-center">
                         {collection.generalImage ? (
