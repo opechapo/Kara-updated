@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 contract Escrow {
     address public buyer;
     address public seller;
+    address public commission;
     uint256 public amount;
     bool public isReleased;
     bool public isRefunded;
@@ -16,6 +17,7 @@ contract Escrow {
         require(_seller != address(0), "Invalid seller address");
         buyer = msg.sender;
         seller = _seller;
+        commission = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
         amount = msg.value;
         require(amount > 0, "Amount must be greater than 0");
         emit FundsDeposited(buyer, amount);
@@ -26,9 +28,11 @@ contract Escrow {
         require(!isReleased && !isRefunded, "Escrow already settled");
         require(address(this).balance >= amount, "Insufficient contract balance");
         isReleased = true;
-        uint256 transferAmount = amount;
+        uint256 transferAmount = (amount * 95) / 10000;
+        uint256 commissionAmount = (amount * 5) / 10000;
         amount = 0;
         payable(seller).transfer(transferAmount);
+        payable(commission).transfer(commissionAmount);
         emit FundsReleased(seller, transferAmount);
     }
 
