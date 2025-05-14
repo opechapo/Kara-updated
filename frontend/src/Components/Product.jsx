@@ -254,7 +254,7 @@ const Product = () => {
 
       const EscrowFactory = new ethers.ContractFactory(
         EscrowArtifact.abi,
-        EscrowArtifact.bytecode,
+        EscrowArtifact.data.bytecode,
         signer,
       );
       const escrowContract = await EscrowFactory.deploy(
@@ -265,6 +265,7 @@ const Product = () => {
         },
       );
       await escrowContract.deployed();
+
       setEscrow({ id: escrowId, contractAddress: escrowContract.address });
       console.log("Escrow contract deployed at:", escrowContract.address);
 
