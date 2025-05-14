@@ -11,6 +11,7 @@ import Footer from "../Layouts/Footer";
 import detectEthereumProvider from "@metamask/detect-provider";
 import { ethers } from "ethers";
 import EscrowArtifact from "../Escrow.json";
+import { useAccount } from "wagmi";
 
 const Product = () => {
   const { productId } = useParams();
@@ -26,6 +27,7 @@ const Product = () => {
   const [escrowTransactions, setEscrowTransactions] = useState([]);
   const [isInitiatingEscrow, setIsInitiatingEscrow] = useState(false);
   const [isReleasingFunds, setIsReleasingFunds] = useState(false);
+  const { isConnected } = useAccount();
 
   console.log(product);
 
@@ -564,10 +566,14 @@ const Product = () => {
                 {!escrow && (
                   <button
                     onClick={() => {
-                      if (product.amount === 0) {
-                        alert("This product is currently not available.");
+                      if (isConnected) {
+                        if (product.amount === 0) {
+                          alert("This product is currently not available.");
+                        } else {
+                          initiateEscrow();
+                        }
                       } else {
-                        initiateEscrow();
+                        alert("Connect your wallet to proceed.");
                       }
                     }}
                     className="flex-1 bg-purple-900 text-white py-2 rounded-lg text-center font-semibold cursor-pointer"

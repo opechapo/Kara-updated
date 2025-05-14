@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useAccount, useSignMessage, useDisconnect } from "wagmi";
+import React, { useEffect, useState } from "react";
+import { useAccount, useDisconnect, useSignMessage } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { SiweMessage } from "siwe";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +22,7 @@ export const ConnectWallet = () => {
       // Fetch nonce
       const nonceResponse = await fetch(
         `http://localhost:3000/user/nonce/${address}`,
-        { method: "GET" }
+        { method: "GET" },
       );
       const nonceData = await nonceResponse.json();
       const nonce = nonceData.data.nonce;
@@ -35,12 +35,12 @@ export const ConnectWallet = () => {
       const siweMessage = new SiweMessage({
         domain: window.location.host,
         address: address,
-        statement: 'Allow me connect.',
+        statement: "Allow me connect.",
         uri: window.location.origin,
         version: "1",
         chainId: 84532,
         nonce: nonce,
-        issuedAt: new Date().toISOString()
+        issuedAt: new Date().toISOString(),
       });
 
       // Prepare message correctly
@@ -62,7 +62,7 @@ export const ConnectWallet = () => {
             signature,
             message: message, // Send the prepared message string, not the siweMessage object
           }),
-        }
+        },
       );
 
       const data = await connectResponse.json();
@@ -88,9 +88,11 @@ export const ConnectWallet = () => {
       if (err.message?.includes("User rejected request")) {
         userError = "Signature cancelled. Please approve the signature.";
       } else if (err.message?.includes("Cannot read properties of null")) {
-        userError = "Wallet signing failed. Please ensure MetaMask is on Base Sepolia.";
+        userError =
+          "Wallet signing failed. Please ensure MetaMask is on Base Sepolia.";
       } else if (err.message?.includes("preparing message")) {
-        userError = "Error preparing message. Please check your connection and try again.";
+        userError =
+          "Error preparing message. Please check your connection and try again.";
       }
 
       setErrorMessage(userError);

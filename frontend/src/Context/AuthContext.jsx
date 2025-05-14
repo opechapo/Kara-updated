@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { useAccount, useDisconnect } from "wagmi";
 
 export const AuthContext = createContext({
@@ -9,29 +9,31 @@ export const AuthContext = createContext({
   cartCount: 0,
   notificationCount: 0,
   nonce: null,
-  fetchNonce: async () => { },
-  fetchUserProfile: async () => { },
-  fetchCartCount: async () => { },
-  fetchNotificationCount: async () => { },
-  logout: () => { },
-  setIsAuthenticated: async (value) => { },
-  setToken: async (value) => { },
-  setWalletAddress: async (value) => { }
+  fetchNonce: async () => {},
+  fetchUserProfile: async () => {},
+  fetchCartCount: async () => {},
+  fetchNotificationCount: async () => {},
+  logout: () => {},
+  setIsAuthenticated: async (value) => {},
+  setToken: async (value) => {},
+  setWalletAddress: async (value) => {},
 });
 
 export const AuthProvider = ({ children }) => {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    Boolean(localStorage.getItem("token")),
+  );
   const [isAdmin, setIsAdmin] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [walletAddress, setWalletAddress] = useState("");
   const [cartCount, setCartCount] = useState(
-    Number(localStorage.getItem("cartCount")) || 0
+    Number(localStorage.getItem("cartCount")) || 0,
   );
   const [notificationCount, setNotificationCount] = useState(
-    Number(localStorage.getItem("notificationCount")) || 0
+    Number(localStorage.getItem("notificationCount")) || 0,
   );
   const [nonce, setNonce] = useState(null);
 
@@ -98,12 +100,13 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await fetch(
         "http://localhost:3000/user/profile",
-        { method: "GET" }
+        { method: "GET" },
       );
       const data = await response.json();
 
-      if (!data.success)
+      if (!data.success) {
         throw new Error(data.error || "Failed to fetch profile");
+      }
 
       cache[cacheKey] = data.data;
       cache.lastFetched[cacheKey] = Date.now();
@@ -175,12 +178,13 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await fetch(
         "http://localhost:3000/notifications/count",
-        { method: "GET" }
+        { method: "GET" },
       );
       const data = await response.json();
 
-      if (!data.success)
+      if (!data.success) {
         throw new Error(data.error || "Failed to fetch notification count");
+      }
 
       const count = data.data.count || 0;
 
@@ -233,13 +237,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Check and synchronize wallet connection status
-  useEffect(() => {
-    if (!isConnected && isAuthenticated) {
-      logout();
-    } else if (isConnected && address && !isAuthenticated) {
-      fetchNonce(address);
-    }
-  }, [isConnected, address, isAuthenticated, fetchNonce, logout]);
+  // useEffect(() => {
+  //   console.log(isAuthenticated, "isAuthenticated");
+
+  //   if (!isConnected && isAuthenticated) {
+  //     logout();
+  //   } else if (isConnected && address && !isAuthenticated) {
+  //     fetchNonce(address);
+  //   }
+  // }, [isConnected, address, isAuthenticated, fetchNonce, logout]);
 
   // Initialize data when token is available
   useEffect(() => {
@@ -272,7 +278,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         setIsAuthenticated: updateIsAuthenticated,
         setToken: updateToken,
-        setWalletAddress: updateWalletAddress
+        setWalletAddress: updateWalletAddress,
       }}
     >
       {children}

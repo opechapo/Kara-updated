@@ -1,14 +1,14 @@
 import * as React from "react";
 import "@rainbow-me/rainbowkit/styles.css";
 import {
-  getDefaultConfig,
-  RainbowKitProvider,
   createAuthenticationAdapter,
+  getDefaultConfig,
   RainbowKitAuthenticationProvider,
+  RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
-import { useAccount, WagmiProvider, useDisconnect } from "wagmi";
+import { useAccount, useDisconnect, WagmiProvider } from "wagmi";
 import { baseSepolia } from "wagmi/chains";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SiweMessage } from "siwe";
 import { fetchWithRetry } from "./utils/api";
 import { useNavigate } from "react-router-dom";
@@ -18,13 +18,21 @@ const InnerWagmiConfig = ({ children }) => {
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
   const navigate = useNavigate();
-  const { setIsAuthenticated, setToken, setWalletAddress, nonce, fetchNonce } = useAuth();
-  const [walletAuthStatus, setWalletAuthStatus] = React.useState("unauthenticated");
+  const { setIsAuthenticated, setToken, setWalletAddress, nonce, fetchNonce } =
+    useAuth();
+  const [walletAuthStatus, setWalletAuthStatus] = React.useState(
+    "unauthenticated",
+  );
   const [errorMessage, setErrorMessage] = React.useState("");
 
   const handleVerify = async ({ message, signature }) => {
     try {
-      console.log("Verifying with message:", message, "and signature:", signature);
+      console.log(
+        "Verifying with message:",
+        message,
+        "and signature:",
+        signature,
+      );
       const connectResponse = await fetchWithRetry(
         "http://localhost:3000/user/connect-wallet",
         {
@@ -35,7 +43,7 @@ const InnerWagmiConfig = ({ children }) => {
             signature,
             message,
           }),
-        }
+        },
       );
 
       const data = await connectResponse.json();
@@ -63,7 +71,8 @@ const InnerWagmiConfig = ({ children }) => {
       if (err.message.includes("User rejected request")) {
         userError = "Signature cancelled. Please approve the signature.";
       } else if (err.message.includes("Cannot read properties of null")) {
-        userError = "Wallet signing failed. Please ensure MetaMask is on Base Sepolia and try again.";
+        userError =
+          "Wallet signing failed. Please ensure MetaMask is on Base Sepolia and try again.";
       } else if (err.status === 500) {
         userError = "Server error: Unable to process wallet connection.";
       } else if (err.status === 401) {
@@ -131,14 +140,14 @@ const InnerWagmiConfig = ({ children }) => {
   React.useEffect(() => {
     console.log(
       "Authentication adapter initialized, walletAuthStatus:",
-      walletAuthStatus
+      walletAuthStatus,
     );
   }, [walletAuthStatus]);
 
   return (
     <RainbowKitAuthenticationProvider
-    // adapter={authenticationAdapter}
-    // status={walletAuthStatus}
+      // adapter={authenticationAdapter}
+      // status={walletAuthStatus}
     >
       <RainbowKitProvider modalSize="compact">
         {children}
@@ -153,8 +162,8 @@ const InnerWagmiConfig = ({ children }) => {
 };
 
 export const WagmiConfigProvider = ({ children }) => {
-  const appId =
-    import.meta.env.REOWN_PROJECT_ID || "b972d173034ec0a0cb6cf40713015942";
+  const appId = import.meta.env.REOWN_PROJECT_ID ||
+    "b972d173034ec0a0cb6cf40713015942";
 
   if (!appId) {
     console.warn("Project ID not found");
