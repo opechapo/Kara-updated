@@ -16,6 +16,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+
 const sendWelcomeEmail = async (email) => {
   try {
     await transporter.sendMail({

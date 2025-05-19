@@ -9,14 +9,14 @@ import Categories2 from './assets/Categories2.png';
 import Categories3 from './assets/Categories3.png';
 import Categories4 from './assets/Categories4.png';
 import Categories1 from './assets/Categories1.png';
-import { useAuth } from './context/AuthContext'; // Import useAuth for cart/notification updates
+import { useAuth } from './context/AuthContext';
 
 // Define category routes (same as Header.jsx)
 const categoryLinks = [
   { name: 'Electronics', link: '/electronics' },
-  { name: 'Smartphones & Tablets', link: '/smartphonestabs' },
-  { name: 'Home & Garden', link: '/homeandgarden' },
   { name: 'Fashion', link: '/fashion' },
+  { name: 'Home & Garden', link: '/homeandgarden' },
+  { name: 'Smartphones & Tablets', link: '/smartphonestabs' },
   { name: 'Vehicles', link: '/vehicles' },
 ];
 
@@ -30,7 +30,10 @@ const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState(null);
   const [clickedItems, setClickedItems] = useState({});
-  const { fetchCartCount, fetchNotificationCount } = useAuth(); // For cart updates
+  const [newArrivalsIndex, setNewArrivalsIndex] = useState(0);
+  const [categoriesIndex, setCategoriesIndex] = useState(0);
+  const [homeGardenIndex, setHomeGardenIndex] = useState(0);
+  const { fetchCartCount, fetchNotificationCount } = useAuth();
 
   const API_BASE_URL = 'http://localhost:3000';
   const POLLING_INTERVAL = 30000;
@@ -197,8 +200,8 @@ const LandingPage = () => {
       setTimeout(() => {
         setClickedItems((prev) => ({ ...prev, [productId]: false }));
       }, 1000);
-      fetchCartCount(true); // Update cart count
-      fetchNotificationCount(true); // Update notification count
+      fetchCartCount(true);
+      fetchNotificationCount(true);
       alert('Item added to cart!');
     } catch (err) {
       setError(err.message);
@@ -219,7 +222,15 @@ const LandingPage = () => {
     setCurrentIndex((prevIndex) => (prevIndex === 0 ? stores.length - 1 : prevIndex - 1));
   };
 
-  const categoryBanners = [Categories5, Categories2, Categories3, Categories4, Categories1];
+  const handleSectionPrev = (section, setIndex, items) => {
+    setIndex((prevIndex) => (prevIndex === 0 ? Math.max(items.length - 5, 0) : prevIndex - 1));
+  };
+
+  const handleSectionNext = (section, setIndex, items) => {
+    setIndex((prevIndex) => (prevIndex >= items.length - 5 ? 0 : prevIndex + 1));
+  };
+
+  const categoryBanners = [Categories5, Categories4, Categories3, Categories2, Categories1];
 
   if (error)
     return <div className="text-red-500 p-6 w-full text-center text-lg">{error}</div>;
@@ -261,13 +272,13 @@ const LandingPage = () => {
           </div>
           <button
             onClick={handlePrev}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-opacity-50 p-3 rounded-full cursor-pointer text-white hover:bg-opacity-70 transition"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2  bg-opacity-50 p-3 rounded-full cursor-pointer text-white hover:bg-purple-500 hover:bg-opacity-70 transition"
           >
             <IoIosArrowBack size={40} />
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-opacity-50 p-3 rounded-full text-white cursor-pointer hover:bg-opacity-70 transition"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2  bg-opacity-50 p-3 rounded-full text-white cursor-pointer hover:bg-purple-500 hover:bg-opacity-70 transition"
           >
             <IoIosArrowForward size={40} />
           </button>
@@ -280,114 +291,177 @@ const LandingPage = () => {
       {/* New Arrivals Section */}
       <section className="container mx-auto my-12 px-6">
         <h2 className="text-3xl font-bold text-left text-gray-800 mb-6">New Arrivals</h2>
-        <div className="flex overflow-x-auto space-x-6 pb-4 cursor-pointer scrollbar-hide">
-          {latestProducts.length > 0 ? (
-            latestProducts.slice(0, 5).map((item) => (
-              <div key={item._id} className="min-w-[250px]">
-                <Link to={`/product/${item._id}`} className="hover:scale-105 transition-transform">
-                  <div className="w-60 h-60 bg-gray-100 rounded-lg overflow-hidden">
-                    <img
-                      src={getImageUrl(item.generalImage)}
-                      alt={item.name || 'Product image'}
-                      className="w-full h-full object-cover"
-                    />
+        <div className="relative">
+          <div
+            className="flex overflow-x-auto space-x-6 pb-4 cursor-pointer custom-scrollbar"
+            style={{ scrollBehavior: 'smooth', transform: `translateX(-${newArrivalsIndex * 266}px)` }}
+          >
+            {latestProducts.length > 0 ? (
+              latestProducts.slice(0, 5).map((item) => (
+                <div key={item._id} className="min-w-[250px]">
+                  <Link to={`/product/${item._id}`} className="hover:scale-105 transition-transform">
+                    <div className="w-60 h-60 bg-gray-100 rounded-lg overflow-hidden">
+                      <img
+                        src={getImageUrl(item.generalImage)}
+                        alt={item.name || 'Product image'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </Link>
+                  <div className="bg-white p-4 shadow-md rounded-lg mt-2 flex items-center justify-between">
+                    <div>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {item.price} {item.paymentToken}
+                      </p>
+                      <p className="text-sm text-gray-600 truncate">{item.shortDescription}</p>
+                    </div>
+                    <button
+                      onClick={() => addToCart(item._id)}
+                      className={`p-2 rounded-full transition-colors ${
+                        clickedItems[item._id]
+                          ? 'text-purple-500'
+                          : 'text-purple-300 hover:text-purple-700'
+                      }`}
+                      title="Add to Cart"
+                    >
+                      <FaShoppingCart size={20} />
+                    </button>
                   </div>
-                </Link>
-                <div className="bg-white p-4 shadow-md rounded-lg mt-2 flex items-center justify-between">
-                  <div>
-                    <p className="text-lg font-semibold text-gray-900">
-                      {item.price} {item.paymentToken}
-                    </p>
-                    <p className="text-sm text-gray-600 truncate">{item.shortDescription}</p>
-                  </div>
-                  <button
-                    onClick={() => addToCart(item._id)}
-                    className={`p-2 rounded-full transition-colors ${
-                      clickedItems[item._id]
-                        ? 'text-purple-500'
-                        : 'text-purple-300 hover:text-purple-700'
-                    }`}
-                    title="Add to Cart"
-                  >
-                    <FaShoppingCart size={20} />
-                  </button>
                 </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-600">No new arrivals available.</p>
+              ))
+            ) : (
+              <p className="text-gray-600">No new arrivals available.</p>
+            )}
+          </div>
+          {latestProducts.length > 5 && (
+            <>
+              <button
+                onClick={() => handleSectionPrev('newArrivals', setNewArrivalsIndex, latestProducts)}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-purple-300 bg-opacity-50 p-2 rounded-full cursor-pointer text-white hover:bg-purple-500 hover:bg-opacity-70 transition"
+              >
+                <IoIosArrowBack size={30} />
+              </button>
+              <button
+                onClick={() => handleSectionNext('newArrivals', setNewArrivalsIndex, latestProducts)}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-purple-300 bg-opacity-50 p-2 rounded-full cursor-pointer text-white hover:bg-purple-500 hover:bg-opacity-70 transition"
+              >
+                <IoIosArrowForward size={30} />
+              </button>
+            </>
           )}
         </div>
       </section>
       {/* Categories Section */}
       <section className="container mx-auto my-12 px-6">
         <h2 className="text-3xl font-bold text-left text-gray-800 mb-6">Categories</h2>
-        <div className="flex overflow-x-auto space-x-6 pb-4 cursor-pointer scrollbar-hide">
-          {categories.length > 0 ? (
-            categories.map((category, index) => (
-              <Link
-                to={category.link}
-                key={index}
-                className="hover:scale-105 transition-transform"
+        <div className="relative">
+          <div
+            className="flex overflow-x-auto space-x-6 pb-4 cursor-pointer custom-scrollbar"
+            style={{ scrollBehavior: 'smooth', transform: `translateX(-${categoriesIndex * 266}px)` }}
+          >
+            {categories.length > 0 ? (
+              categories.map((category, index) => (
+                <Link
+                  to={category.link}
+                  key={index}
+                  className="hover:scale-105 transition-transform"
+                >
+                  <div className="min-w-[250px]">
+                    <div className="w-60 h-60 bg-gray-100 rounded-lg overflow-hidden">
+                      <img
+                        src={categoryBanners[index % categoryBanners.length]}
+                        alt={category.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="bg-white p-4 shadow-md rounded-lg mt-2">
+                      <p className="text-lg font-semibold text-gray-900">{category.name}</p>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="text-gray-600">No categories available.</p>
+            )}
+          </div>
+          {categories.length > 5 && (
+            <>
+              <button
+                onClick={() => handleSectionPrev('categories', setCategoriesIndex, categories)}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-purple-300 bg-opacity-50 p-2 rounded-full cursor-pointer text-white hover:bg-purple-500 hover:bg-opacity-70 transition"
               >
-                <div className="min-w-[250px]">
-                  <div className="w-60 h-60 bg-gray-100 rounded-lg overflow-hidden">
-                    <img
-                      src={categoryBanners[index % categoryBanners.length]}
-                      alt={category.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="bg-white p-4 shadow-md rounded-lg mt-2">
-                    <p className="text-lg font-semibold text-gray-900">{category.name}</p>
-                  </div>
-                </div>
-              </Link>
-            ))
-          ) : (
-            <p className="text-gray-600">No categories available.</p>
+                <IoIosArrowBack size={30} />
+              </button>
+              <button
+                onClick={() => handleSectionNext('categories', setCategoriesIndex, categories)}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-purple-300 bg-opacity-50 p-2 rounded-full cursor-pointer text-white hover:bg-purple-500 hover:bg-opacity-70 transition"
+              >
+                <IoIosArrowForward size={30} />
+              </button>
+            </>
           )}
         </div>
       </section>
       {/* Homes & Gardens Section */}
       <section className="container mx-auto my-12 px-6">
         <h2 className="text-3xl font-bold text-left text-gray-800 mb-6">Homes & Gardens</h2>
-        <div className="flex overflow-x-auto space-x-6 pb-4 cursor-pointer scrollbar-hide">
-          {homeGardenItems.length > 0 ? (
-            homeGardenItems.slice(0, 5).map((item) => (
-              <div key={item._id} className="min-w-[250px]">
-                <Link to={`/product/${item._id}`} className="hover:scale-105 transition-transform">
-                  <div className="w-60 h-60 bg-gray-100 rounded-lg overflow-hidden">
-                    <img
-                      src={getImageUrl(item.generalImage)}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
+        <div className="relative">
+          <div
+            className="flex overflow-x-auto space-x-6 pb-4 cursor-pointer custom-scrollbar"
+            style={{ scrollBehavior: 'smooth', transform: `translateX(-${homeGardenIndex * 266}px)` }}
+          >
+            {homeGardenItems.length > 0 ? (
+              homeGardenItems.slice(0, 5).map((item) => (
+                <div key={item._id} className="min-w-[250px]">
+                  <Link to={`/product/${item._id}`} className="hover:scale-105 transition-transform">
+                    <div className="w-60 h-60 bg-gray-100 rounded-lg overflow-hidden">
+                      <img
+                        src={getImageUrl(item.generalImage)}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </Link>
+                  <div className="bg-white p-4 shadow-md rounded-lg mt-2 flex items-center justify-between">
+                    <div>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {item.price} {item.paymentToken}
+                      </p>
+                      <p className="text-sm text-gray-600">{item.shortDescription}</p>
+                    </div>
+                    <button
+                      onClick={() => addToCart(item._id)}
+                      className={`p-2 rounded-full transition-colors ${
+                        clickedItems[item._id]
+                          ? 'text-purple-500'
+                          : 'text-purple-300 hover:text-purple-700'
+                      }`}
+                      title="Add to Cart"
+                    >
+                      <FaShoppingCart size={20} />
+                    </button>
                   </div>
-                </Link>
-                <div className="bg-white p-4 shadow-md rounded-lg mt-2 flex items-center justify-between">
-                  <div>
-                    <p className="text-lg font-semibold text-gray-900">
-                      {item.price} {item.paymentToken}
-                    </p>
-                    <p className="text-sm text-gray-600">{item.shortDescription}</p>
-                  </div>
-                  <button
-                    onClick={() => addToCart(item._id)}
-                    className={`p-2 rounded-full transition-colors ${
-                      clickedItems[item._id]
-                        ? 'text-purple-500'
-                        : 'text-purple-300 hover:text-purple-700'
-                    }`}
-                    title="Add to Cart"
-                  >
-                    <FaShoppingCart size={20} />
-                  </button>
                 </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-600">No Homes & Gardens items available.</p>
+              ))
+            ) : (
+              <p className="text-gray-600">No Homes & Gardens items available.</p>
+            )}
+          </div>
+          {homeGardenItems.length > 5 && (
+            <>
+              <button
+                onClick={() => handleSectionPrev('homeGarden', setHomeGardenIndex, homeGardenItems)}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-purple-300 bg-opacity-50 p-2 rounded-full cursor-pointer text-white hover:bg-purple-500 hover:bg-opacity-70 transition"
+              >
+                <IoIosArrowBack size={30} />
+              </button>
+              <button
+                onClick={() => handleSectionNext('homeGarden', setHomeGardenIndex, homeGardenItems)}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-purple-300 bg-opacity-50 p-2 rounded-full cursor-pointer text-white hover:bg-purple-500 hover:bg-opacity-70 transition"
+              >
+                <IoIosArrowForward size={30} />
+              </button>
+            </>
           )}
         </div>
       </section>

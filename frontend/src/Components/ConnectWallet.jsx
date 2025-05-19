@@ -60,7 +60,7 @@ export const ConnectWallet = () => {
           body: JSON.stringify({
             walletAddress: address,
             signature,
-            message: message, // Send the prepared message string, not the siweMessage object
+            message: message, 
           }),
         },
       );
@@ -106,6 +106,7 @@ export const ConnectWallet = () => {
     }
   }, [isConnected, address, isAuthenticated]);
 
+  
   // Clear error message when connection state changes
   useEffect(() => {
     setErrorMessage("");
