@@ -15,6 +15,7 @@ const CreateStore = () => {
     logo: null,
   });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // New state for loading
 
   const handleStoreChange = (e) => {
     const { name, value } = e.target;
@@ -28,6 +29,7 @@ const CreateStore = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Set loading state to true
     const formData = new FormData();
     formData.append('name', storeData.name);
     formData.append('description', storeData.description);
@@ -53,6 +55,8 @@ const CreateStore = () => {
       navigate('/profile');
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsLoading(false); // Reset loading state
     }
   };
 
@@ -160,9 +164,36 @@ const CreateStore = () => {
 
           <button
             type="submit"
-            className="bg-purple-900 text-white px-6 py-4 rounded-md hover:bg-purple-800 transition-colors w-full text-lg"
+            className="bg-purple-900 text-white px-6 py-4 rounded-md hover:bg-purple-800 transition-colors w-full text-lg flex items-center justify-center"
+            disabled={isLoading} // Disable button while loading
           >
-            Create Store
+            {isLoading ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 mr-3 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  ></path>
+                </svg>
+                Creating...
+              </>
+            ) : (
+              'Create Store'
+            )}
           </button>
         </form>
       </div>
