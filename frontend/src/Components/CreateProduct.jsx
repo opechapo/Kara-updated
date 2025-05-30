@@ -118,7 +118,8 @@ const CreateProduct = () => {
     } catch (err) {
       console.error('Create product error:', err.message);
       setError(err.message);
-      setLoading(false);
+    } finally {
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -142,7 +143,6 @@ const CreateProduct = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">Create Product</h2>
           {error && <p className="text-red-500 mb-4">{error}</p>}
           {success && <p className="text-green-500 mb-4">{success}</p>}
-          {loading && <p className="text-gray-600 mb-4">Creating product...</p>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-gray-700">Name</label>
@@ -295,10 +295,36 @@ const CreateProduct = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-purple-900 text-white p-2 rounded hover:bg-purple-700 disabled:bg-gray-400"
+              className="w-full bg-purple-900 text-white p-2 rounded hover:bg-purple-700 disabled:bg-gray-400 flex items-center justify-center cursor-pointer"
               disabled={loading}
             >
-              {loading ? 'Creating...' : 'Create Product'}
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  Creating...
+                </>
+              ) : (
+                'Create Product'
+              )}
             </button>
           </form>
         </div>

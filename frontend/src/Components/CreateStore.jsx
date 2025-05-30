@@ -164,7 +164,7 @@ const CreateStore = () => {
 
           <button
             type="submit"
-            className="bg-purple-900 text-white px-6 py-4 rounded-md hover:bg-purple-800 transition-colors w-full text-lg flex items-center justify-center"
+            className="bg-purple-900 text-white px-6 py-4 rounded-md hover:bg-purple-800 transition-colors w-full text-lg flex items-center justify-center cursor-pointer"
             disabled={isLoading} // Disable button while loading
           >
             {isLoading ? (

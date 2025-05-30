@@ -16,6 +16,7 @@ const CreateCollection = () => {
   const [stores, setStores] = useState([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false); // New state for submit loading
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -61,6 +62,7 @@ const CreateCollection = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); // Clear previous errors
+    setIsSubmitting(true); // Set submitting state to true
     const formData = new FormData();
     formData.append('name', collectionData.name);
     formData.append('shortDescription', collectionData.shortDescription);
@@ -86,6 +88,8 @@ const CreateCollection = () => {
     } catch (err) {
       console.error('Submit error:', err.message);
       setError(err.message);
+    } finally {
+      setIsSubmitting(false); // Reset submitting state
     }
   };
 
@@ -195,9 +199,36 @@ const CreateCollection = () => {
           </div>
           <button
             type="submit"
-            className="bg-purple-900 text-white px-6 py-4 rounded-md hover:bg-purple-800 transition-colors w-full text-lg"
+            className="bg-purple-900 text-white px-6 py-4 rounded-md hover:bg-purple-800 cursor-pointer transition-colors w-full text-lg flex items-center justify-center"
+            disabled={isSubmitting} // Disable button while submitting
           >
-            Create Collection
+            {isSubmitting ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 mr-3 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  ></path>
+                </svg>
+                Creating...
+              </>
+            ) : (
+              'Create Collection'
+            )}
           </button>
         </form>
       </div>
