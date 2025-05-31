@@ -269,7 +269,7 @@ const Store = () => {
                 </ul>
               </div>
               <div className="mb-10">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Description</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Description:</h3>
                 <p className="text-gray-600">{store.description}</p>
               </div>
               <div className="mb-10">
