@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
-import { FaSpinner, FaShoppingCart } from 'react-icons/fa';
+import { FaShoppingCart } from 'react-icons/fa';
 import Header from './Layouts/Header';
 import Footer from './Layouts/Footer';
 import Categories5 from './assets/Categories5.png';
@@ -9,6 +9,7 @@ import Categories2 from './assets/Categories2.png';
 import Categories3 from './assets/Categories3.png';
 import Categories4 from './assets/Categories4.png';
 import Categories1 from './assets/Categories1.png';
+import KaraLoader2 from './assets/KaraLoader2.png'; // New import for loader
 import { useAuth } from './context/AuthContext';
 
 // Define category routes (same as Header.jsx)
@@ -148,7 +149,7 @@ const LandingPage = () => {
           });
           setCategories(mappedCategories);
         } else {
-          console.warn('Categories fetch failed:', categoriesData.error);
+          console.warn('Categories fetch Di failed:', categoriesData.error);
           setCategories([]);
         }
       } catch (err) {
@@ -237,7 +238,11 @@ const LandingPage = () => {
   if (isLoading) {
     return (
       <div className="p-6 w-full flex justify-center items-center min-h-screen">
-        <FaSpinner className="animate-spin text-purple-900 text-4xl" />
+        <img
+          src={KaraLoader2}
+          alt="Loading"
+          className="w-42 h-42 animate-bounce"
+        />
       </div>
     );
   }

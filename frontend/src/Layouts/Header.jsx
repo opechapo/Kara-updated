@@ -3,7 +3,7 @@ import { useAccount, useSignMessage, useDisconnect } from 'wagmi';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { IoMdNotifications, IoMdCart } from 'react-icons/io';
 import { FaBars, FaUser, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
-import kara from '../assets/KARA.png';
+import karaLogo1 from '../assets/KaraLogo1.png';;
 import { debounce } from 'lodash';
 import { ConnectWallet } from '../Components/ConnectWallet';
 import { useAuth } from '../context/AuthContext';
@@ -137,7 +137,7 @@ const Header = () => {
       <nav className="container mx-auto flex items-center justify-between px-6 py-3">
         <div className="flex items-center space-x-6">
           <Link to="/" className="flex items-center">
-            <img src={kara} alt="Logo" className="w-16 h-auto" />
+            <img src={karaLogo1} alt="Logo" className="w-16 h-auto" />
           </Link>
           <div
             className="relative"
