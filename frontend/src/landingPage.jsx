@@ -247,6 +247,7 @@ const LandingPage = () => {
     );
   }
 
+
   return (
     <>
       <Header />

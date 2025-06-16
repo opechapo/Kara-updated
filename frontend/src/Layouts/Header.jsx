@@ -3,7 +3,7 @@ import { useAccount, useSignMessage, useDisconnect } from 'wagmi';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { IoMdNotifications, IoMdCart } from 'react-icons/io';
 import { FaBars, FaUser, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
-import karaLogo1 from '../assets/KaraLogo1.png';;
+import karaLogo1 from '../assets/KaraLogo1.png';
 import { debounce } from 'lodash';
 import { ConnectWallet } from '../Components/ConnectWallet';
 import { useAuth } from '../context/AuthContext';
@@ -145,10 +145,10 @@ const Header = () => {
             onMouseLeave={handleCategoryMouseLeave}
           >
             <button
-              className="flex items-center space-x-2 text-lg font-medium text-gray-700 cursor-pointer hover:text-purple-600 transition"
+              className="flex items-center space-x-2 text-base font-medium text-gray-700 cursor-pointer hover:text-purple-600 transition"
               aria-expanded={categoryOpen}
             >
-              <FaBars className="text-xl" />
+              <FaBars className="text-base" />
               <span>Categories</span>
             </button>
             {categoryOpen && (
@@ -158,8 +158,8 @@ const Header = () => {
                     {categories.map((category) => (
                       <li key={category.name}>
                         <Link
-                          to={category.link} // Use mapped link
-                          className="block hover:text-purple-600"
+                          to={category.link}
+                          className="block hover:text-purple-600 text-base"
                         >
                           {category.name}
                         </Link>
@@ -176,7 +176,7 @@ const Header = () => {
             <Link
               key={index}
               to={link}
-              className={`text-lg font-medium text-gray-700 hover:text-purple-600 transition ${
+              className={`text-base font-medium text-gray-700 hover:text-purple-600 transition ${
                 location.pathname === link ? 'text-purple-700 font-semibold' : ''
               }`}
             >
@@ -184,7 +184,7 @@ const Header = () => {
             </Link>
           ))}
         </div>
-        <div className="flex-grow max-w-sm ml-auto relative">
+        <div className="flex-grow max-w-sm ml-8">
           <form onSubmit={handleSearchSubmit}>
             <input
               type="text"

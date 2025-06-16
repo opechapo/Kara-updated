@@ -519,7 +519,7 @@ const Profile = () => {
                 Store
               </Link>
               {/* Uncomment if you want to enable these links */}
-              {/* <Link
+              <Link
                 to="/create-collection"
                 className="bg-transparent text-purple-900 px-4 py-2 rounded-md hover:bg-purple-100 transition-colors cursor-pointer"
               >
@@ -530,7 +530,7 @@ const Profile = () => {
                 className="bg-transparent text-purple-900 px-4 py-2 rounded-md hover:bg-purple-100 transition-colors cursor-pointer"
               >
                 Product
-              </Link> */}
+              </Link>
             </div>
           )}
 

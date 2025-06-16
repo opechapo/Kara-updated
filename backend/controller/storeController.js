@@ -18,8 +18,6 @@ const getStores = asyncHandler(async (req, res) => {
 });
 
 
-
-
 // @desc    Get a single store by ID
 // @route   GET /stores/:id
 // @access  Private
