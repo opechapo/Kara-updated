@@ -9,7 +9,7 @@ import Categories2 from './assets/Categories2.png';
 import Categories3 from './assets/Categories3.png';
 import Categories4 from './assets/Categories4.png';
 import Categories1 from './assets/Categories1.png';
-import KaraLoader2 from './assets/KaraLoader2.png'; // New import for loader
+import KaraLoader2 from './assets/KaraLoader2.png';
 import { useAuth } from './Context/AuthContext';
 
 // Define category routes (same as Header.jsx)
@@ -149,7 +149,7 @@ const LandingPage = () => {
           });
           setCategories(mappedCategories);
         } else {
-          console.warn('Categories fetch Di failed:', categoriesData.error);
+          console.warn('Categories fetch failed:', categoriesData.error);
           setCategories([]);
         }
       } catch (err) {
@@ -209,11 +209,23 @@ const LandingPage = () => {
     }
   };
 
+  // Existing useEffect for data fetching
   useEffect(() => {
     fetchData();
     const intervalId = setInterval(fetchStores, POLLING_INTERVAL);
     return () => clearInterval(intervalId);
   }, [fetchCartCount, fetchNotificationCount]);
+
+  // New useEffect for auto-scrolling
+  useEffect(() => {
+    if (stores.length <= 1) return;
+
+    const autoScroll = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % stores.length);
+    }, 5000);
+
+    return () => clearInterval(autoScroll);
+  }, [stores.length]);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % stores.length);
@@ -247,7 +259,6 @@ const LandingPage = () => {
     );
   }
 
-
   return (
     <>
       <Header />
@@ -278,13 +289,13 @@ const LandingPage = () => {
           </div>
           <button
             onClick={handlePrev}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2  bg-opacity-50 p-3 rounded-full cursor-pointer text-white hover:bg-purple-500 hover:bg-opacity-70 transition"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-opacity-50 p-3 rounded-full cursor-pointer text-white hover:bg-purple-500 hover:bg-opacity-70 transition"
           >
             <IoIosArrowBack size={40} />
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2  bg-opacity-50 p-3 rounded-full text-white cursor-pointer hover:bg-purple-500 hover:bg-opacity-70 transition"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-opacity-50 p-3 rounded-full text-white cursor-pointer hover:bg-purple-500 hover:bg-opacity-70 transition"
           >
             <IoIosArrowForward size={40} />
           </button>
@@ -433,7 +444,7 @@ const LandingPage = () => {
                       <p className="text-lg font-semibold text-gray-900">
                         {item.price} {item.paymentToken}
                       </p>
-                      <p className="text-sm text-gray-600">{item.shortDescription}</p>
+                      <p className="text-sm text-gray-600">{item.name}</p>
                     </div>
                     <button
                       onClick={() => addToCart(item._id)}
