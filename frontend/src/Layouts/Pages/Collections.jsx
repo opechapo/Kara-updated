@@ -70,7 +70,7 @@ const Collections = () => {
               <Link
                 to={`/collections/${collection._id}`}
                 key={collection._id}
-                className="cursor-pointer group bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
+                className="cursor-pointer group  rounded-lg  p-4 hover:shadow-lg transition-shadow"
               >
                 <div className="flex flex-col items-center">
                   {collection.generalImage ? (

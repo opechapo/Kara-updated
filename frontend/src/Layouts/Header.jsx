@@ -1,26 +1,26 @@
-import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
-import { useAccount, useSignMessage, useDisconnect } from 'wagmi';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { IoMdNotifications, IoMdCart } from 'react-icons/io';
-import { FaBars, FaUser, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
-import karaLogo1 from '../assets/KaraLogo1.png';
-import { debounce } from 'lodash';
-import { ConnectWallet } from '../Components/ConnectWallet';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect, useCallback, useRef, memo } from "react";
+import { useAccount, useSignMessage, useDisconnect } from "wagmi";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { IoMdNotifications, IoMdCart } from "react-icons/io";
+import { FaBars, FaUser, FaUserCircle, FaSignOutAlt } from "react-icons/fa";
+import karaLogo1 from "../assets/KaraLogo1.png";
+import { debounce } from "lodash";
+import { ConnectWallet } from "../Components/ConnectWallet";
+import { useAuth } from "../context/AuthContext";
 
 // Define category routes (same as LandingPage.jsx)
 const categoryLinks = [
-  { name: 'Electronics', link: '/electronics' },
-  { name: 'Smartphones & Tablets', link: '/smartphonestabs' },
-  { name: 'Home & Garden', link: '/homeandgarden' },
-  { name: 'Fashion', link: '/fashion' },
-  { name: 'Vehicles', link: '/vehicles' },
+  { name: "Electronics", link: "/electronics" },
+  { name: "Smartphones & Tablets", link: "/smartphonestabs" },
+  { name: "Home & Garden", link: "/homeandgarden" },
+  { name: "Fashion", link: "/fashion" },
+  { name: "Vehicles", link: "/vehicles" },
 ];
 
 const navItems = [
-  { title: 'Stores', link: '/stores' },
-  { title: 'Collections', link: '/collections' },
-  { title: 'About Us', link: '/aboutus' },
+  { title: "Stores", link: "/stores" },
+  { title: "Collections", link: "/collections" },
+  { title: "About Us", link: "/aboutus" },
 ];
 
 const Header = () => {
@@ -46,28 +46,30 @@ const Header = () => {
 
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
-  const [emailInput, setEmailInput] = useState('');
+  const [emailInput, setEmailInput] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [closeTimeout, setCloseTimeout] = useState(null);
   const [profileCloseTimeout, setProfileCloseTimeout] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Fetch categories
   const fetchCategories = useCallback(async (force = false) => {
     try {
-      const response = await fetch('http://localhost:3000/api/categories', {
-        method: 'GET',
-        credentials: 'include',
+      const response = await fetch("http://localhost:3000/api/categories", {
+        method: "GET",
+        credentials: "include",
       });
       const data = await response.json();
-      if (!data.success) throw new Error(data.error || 'Failed to fetch categories');
+      if (!data.success)
+        throw new Error(data.error || "Failed to fetch categories");
       // Map backend categories to predefined routes
       const mappedCategories = (data.data || []).map((category, index) => {
         const matchedCategory =
-          categoryLinks.find((c) => c.name.toLowerCase() === category.name?.toLowerCase()) ||
-          categoryLinks[index % categoryLinks.length]; // Fallback to indexed link
+          categoryLinks.find(
+            (c) => c.name.toLowerCase() === category.name?.toLowerCase()
+          ) || categoryLinks[index % categoryLinks.length]; // Fallback to indexed link
         return {
           ...category,
           link: matchedCategory.link,
@@ -75,9 +77,9 @@ const Header = () => {
       });
       setCategories(mappedCategories);
     } catch (err) {
-      console.warn('Categories fetch error:', err.message);
+      console.warn("Categories fetch error:", err.message);
       setCategories([]);
-      setErrorMessage('Unable to load categories.');
+      setErrorMessage("Unable to load categories.");
     }
   }, []);
 
@@ -87,7 +89,7 @@ const Header = () => {
 
   const handleEmailSubmit = useCallback(() => {
     if (window.handleModalSubmit) window.handleModalSubmit(emailInput || null);
-    setEmailInput('');
+    setEmailInput("");
     setIsEmailModalOpen(false);
     fetchNotificationCount(true);
   }, [emailInput, fetchNotificationCount]);
@@ -95,7 +97,7 @@ const Header = () => {
   const handleEmailSkip = useCallback(() => {
     if (window.handleModalSubmit) window.handleModalSubmit(null);
     setIsEmailModalOpen(false);
-    setEmailInput('');
+    setEmailInput("");
   }, []);
 
   const handleCategoryMouseEnter = useCallback(() => {
@@ -118,15 +120,18 @@ const Header = () => {
     setProfileCloseTimeout(timeout);
   }, []);
 
-  const handleCartClick = useCallback(() => navigate('/cart'), [navigate]);
-  const handleNotificationsClick = useCallback(() => navigate('/notifications'), [navigate]);
+  const handleCartClick = useCallback(() => navigate("/cart"), [navigate]);
+  const handleNotificationsClick = useCallback(
+    () => navigate("/notifications"),
+    [navigate]
+  );
 
   const handleSearchSubmit = useCallback(
     (e) => {
       e.preventDefault();
       if (searchQuery.trim()) {
         navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-        setSearchQuery('');
+        setSearchQuery("");
       }
     },
     [searchQuery, navigate]
@@ -177,7 +182,9 @@ const Header = () => {
               key={index}
               to={link}
               className={`text-base font-medium text-gray-700 hover:text-purple-600 transition ${
-                location.pathname === link ? 'text-purple-700 font-semibold' : ''
+                location.pathname === link
+                  ? "text-purple-700 font-semibold"
+                  : ""
               }`}
             >
               {title}
@@ -193,12 +200,12 @@ const Header = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full p-2 border-none rounded-full focus:outline-none placeholder-gray-500 px-4 bg-white"
               style={{
-                border: '1.5px solid transparent',
-                borderRadius: '20px',
+                border: "1.5px solid transparent",
+                borderRadius: "20px",
                 backgroundImage:
-                  'linear-gradient(white, white), linear-gradient(90deg, #FFA5A5 0%, #A044FF 29%, #FFA5A5 73%, #A044FF 100%)',
-                backgroundOrigin: 'border-box',
-                backgroundClip: 'padding-box, border-box',
+                  "linear-gradient(white, white), linear-gradient(90deg, #FFA5A5 0%, #A044FF 29%, #FFA5A5 73%, #A044FF 100%)",
+                backgroundOrigin: "border-box",
+                backgroundClip: "padding-box, border-box",
               }}
             />
           </form>
@@ -226,12 +233,12 @@ const Header = () => {
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50">
                     <Link
-                      to={isAdmin ? '/admin-profile' : '/profile'}
+                      to={isAdmin ? "/admin-profile" : "/profile"}
                       className="flex items-center px-4 py-2 text-gray-700 hover:bg-purple-100"
                       onClick={() => setIsDropdownOpen(false)}
                     >
                       <FaUserCircle className="mr-2" />
-                      {isAdmin ? 'Admin Profile' : 'Profile'}
+                      {isAdmin ? "Admin Profile" : "Profile"}
                     </Link>
                     {/* <button
                       onClick={logout}
@@ -276,8 +283,12 @@ const Header = () => {
       {isEmailModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Enter Your Email</h2>
-            <p className="text-gray-600 mb-4">Provide an email to receive notifications (optional).</p>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Enter Your Email
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Provide an email to receive notifications (optional).
+            </p>
             <input
               type="email"
               value={emailInput}

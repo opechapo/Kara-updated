@@ -463,7 +463,7 @@ const Profile = () => {
             <div className="flex space-x-6">
               <button
                 onClick={() => handleTabChange('stores')}
-                className={`text-lg font-semibold ${
+                className={`text-sm font-semibold ${
                   activeTab === 'stores'
                     ? 'text-purple-900 border-b-2 border-purple-900'
                     : 'text-gray-700 hover:text-purple-700'
@@ -473,7 +473,7 @@ const Profile = () => {
               </button>
               <button
                 onClick={() => handleTabChange('collections')}
-                className={`text-lg font-semibold ${
+                className={`text-sm font-semibold ${
                   activeTab === 'collections'
                     ? 'text-purple-900 border-b-2 border-purple-900'
                     : 'text-gray-700 hover:text-purple-700'
@@ -483,7 +483,7 @@ const Profile = () => {
               </button>
               <button
                 onClick={() => handleTabChange('products')}
-                className={`text-lg font-semibold ${
+                className={`text-sm font-semibold ${
                   activeTab === 'products'
                     ? 'text-purple-900 border-b-2 border-purple-900'
                     : 'text-gray-700 hover:text-purple-700'
@@ -493,7 +493,7 @@ const Profile = () => {
               </button>
               <button
                 onClick={() => handleTabChange('transactions')}
-                className={`text-lg font-semibold ${
+                className={`text-sm font-semibold ${
                   activeTab === 'transactions'
                     ? 'text-purple-900 border-b-2 border-purple-900'
                     : 'text-gray-700 hover:text-purple-700'

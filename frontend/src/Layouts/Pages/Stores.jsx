@@ -16,9 +16,8 @@ const Stores = () => {
       return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==';
     }
     const baseUrl = 'http://localhost:3000';
-    const normalizedPath = imagePath.toLowerCase().startsWith('/uploads/')
-      ? `/Uploads/${imagePath.split('/uploads/')[1]}`
-      : `/Uploads/${imagePath}`;
+    // Ensure path starts with /Uploads/ and encode special characters
+    const normalizedPath = imagePath.startsWith('/Uploads/') ? imagePath : `/Uploads/${imagePath}`;
     const encodedPath = encodeURI(normalizedPath);
     console.log('getImageUrl:', { input: imagePath, output: `${baseUrl}${encodedPath}` });
     return `${baseUrl}${encodedPath}`;
@@ -65,12 +64,12 @@ const Stores = () => {
       <div className="p-6 max-w-6xl mx-auto bg-gray-50 rounded-xl pt-20 shadow-lg">
         <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">All Stores</h1>
         {stores.length > 0 ? (
-          <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {stores.map((store) => (
               <Link
                 to={`/store/${store._id}`}
                 key={store._id}
-                className="cursor-pointer group bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
+                className="cursor-pointer group  rounded-lg  p-4 hover:shadow-lg transition-shadow"
               >
                 <div className="flex flex-col items-center">
                   {store.logo ? (

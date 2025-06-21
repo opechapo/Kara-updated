@@ -10,7 +10,7 @@ import Categories3 from './assets/Categories3.png';
 import Categories4 from './assets/Categories4.png';
 import Categories1 from './assets/Categories1.png';
 import KaraLoader2 from './assets/KaraLoader2.png'; // New import for loader
-import { useAuth } from './context/AuthContext';
+import { useAuth } from './Context/AuthContext';
 
 // Define category routes (same as Header.jsx)
 const categoryLinks = [
@@ -316,10 +316,10 @@ const LandingPage = () => {
                   </Link>
                   <div className="bg-white p-4 shadow-md rounded-lg mt-2 flex items-center justify-between">
                     <div>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-sm font-semibold text-gray-900">
                         {item.price} {item.paymentToken}
                       </p>
-                      <p className="text-sm text-gray-600 truncate">{item.shortDescription}</p>
+                      <p className="text-lg text-gray-600 truncate">{item.name}</p>
                     </div>
                     <button
                       onClick={() => addToCart(item._id)}

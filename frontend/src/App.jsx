@@ -49,7 +49,7 @@ import Notifications from "./Layouts/Pages/Notifications";
 import Search from "./Layouts/Pages/Search";
 import MyProducts from "./Components/MyProducts";
 import AdminProfile from "./Components/AdminProfile";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./Context/AuthContext";
 
 // Placeholder components for My Listings and My Purchases
 const MyListings = () => (
@@ -63,72 +63,72 @@ function App() {
   return (
     <Routes>
       {/* <Route element={<AuthProvider />}> */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/electronics" element={<Electronics />} />
-        <Route path="/smartphonestabs" element={<MobilePhoneAndTabs />} />
-        <Route path="/homeandgarden" element={<HomeGardens />} />
-        <Route path="/fashion" element={<Fashion />} />
-        <Route path="/vehicles" element={<Vehicles />} />
-        <Route
-          path="/products/category/:category"
-          element={<CategoryProducts />}
-        />
-        <Route path="/aboutus" element={<AboutUs />} />
-        <Route path="/vehicles/cars" element={<Cars />} />
-        <Route path="/vehicles/busandminibus" element={<BusAndMinibus />} />
-        <Route
-          path="/vehicles/motorcycleandtricycle"
-          element={<MotorcycleAndTricycle />}
-        />
-        <Route path="/vehicles/truckandtrailer" element={<TruckAndTrailer />} />
-        <Route path="/vehicles/heavyduty" element={<HeavyDuty />} />
-        <Route path="/mercedesgwagon" element={<MercedesGwagon />} />
-        <Route path="/mobilephone" element={<MobilePhone />} />
-        <Route path="/tablets" element={<Tablets />} />
-        <Route path="/smartwatch" element={<SmartWatch />} />
-        <Route
-          path="/phoneandtabaccesories"
-          element={<PhoneAndTabAccesories />}
-        />
-        <Route path="/furnitures" element={<Furnitures />} />
-        <Route path="/homeappliance" element={<HomeAppliance />} />
-        <Route path="/kitchenappliances" element={<KitchenAppliances />} />
-        <Route path="/homeaccesories" element={<HomeAccesories />} />
-        <Route path="/stores" element={<Stores />} />
-        <Route path="/collections" element={<Collections />} />
-        <Route path="/fashion/bags" element={<Bags />} />
-        <Route path="/fashion/clothings" element={<Clothings />} />
-        <Route path="/fashion/watches" element={<Watches />} />
-        <Route path="/fashion/shoes" element={<Shoes />} />
-        <Route
-          path="/electronics/audioandmusicinstrument"
-          element={<AudioAndMusicInstrument />}
-        />
-        <Route path="/cubannaautosstores" element={<CubannaAutosStores />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/admin-profile" element={<AdminProfile />} />
-        <Route path="/create-store" element={<CreateStore />} />
-        <Route path="/my-listings" element={<MyListings />} />
-        <Route path="/my-purchases" element={<MyPurchases />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/store/:id" element={<Store />} />
-        <Route path="/collections/:collectionId" element={<MyCollections />} />
-        <Route path="/update-store/:id" element={<UpdateStore />} />
-        <Route
-          path="/store/:storeId/create-product"
-          element={<CreateProduct />}
-        />
-        <Route path="/product/:productId" element={<Product />} />
-        <Route path="/create-collection" element={<CreateCollection />} />
-        <Route
-          path="/update-collection/:collectionId"
-          element={<UpdateCollection />}
-        />
-        <Route path="/update-product/:productId" element={<UpdateProduct />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/my-products" element={<MyProducts />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/electronics" element={<Electronics />} />
+      <Route path="/smartphonestabs" element={<MobilePhoneAndTabs />} />
+      <Route path="/homeandgarden" element={<HomeGardens />} />
+      <Route path="/fashion" element={<Fashion />} />
+      <Route path="/vehicles" element={<Vehicles />} />
+      <Route
+        path="/products/category/:category"
+        element={<CategoryProducts />}
+      />
+      <Route path="/aboutus" element={<AboutUs />} />
+      <Route path="/vehicles/cars" element={<Cars />} />
+      <Route path="/vehicles/busandminibus" element={<BusAndMinibus />} />
+      <Route
+        path="/vehicles/motorcycleandtricycle"
+        element={<MotorcycleAndTricycle />}
+      />
+      <Route path="/vehicles/truckandtrailer" element={<TruckAndTrailer />} />
+      <Route path="/vehicles/heavyduty" element={<HeavyDuty />} />
+      <Route path="/mercedesgwagon" element={<MercedesGwagon />} />
+      <Route path="/mobilephone" element={<MobilePhone />} />
+      <Route path="/tablets" element={<Tablets />} />
+      <Route path="/smartwatch" element={<SmartWatch />} />
+      <Route
+        path="/phoneandtabaccesories"
+        element={<PhoneAndTabAccesories />}
+      />
+      <Route path="/furnitures" element={<Furnitures />} />
+      <Route path="/homeappliance" element={<HomeAppliance />} />
+      <Route path="/kitchenappliances" element={<KitchenAppliances />} />
+      <Route path="/homeaccesories" element={<HomeAccesories />} />
+      <Route path="/stores" element={<Stores />} />
+      <Route path="/collections" element={<Collections />} />
+      <Route path="/fashion/bags" element={<Bags />} />
+      <Route path="/fashion/clothings" element={<Clothings />} />
+      <Route path="/fashion/watches" element={<Watches />} />
+      <Route path="/fashion/shoes" element={<Shoes />} />
+      <Route
+        path="/electronics/audioandmusicinstrument"
+        element={<AudioAndMusicInstrument />}
+      />
+      <Route path="/cubannaautosstores" element={<CubannaAutosStores />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/admin-profile" element={<AdminProfile />} />
+      <Route path="/create-store" element={<CreateStore />} />
+      <Route path="/my-listings" element={<MyListings />} />
+      <Route path="/my-purchases" element={<MyPurchases />} />
+      <Route path="/logout" element={<Logout />} />
+      <Route path="/store/:id" element={<Store />} />
+      <Route path="/collections/:collectionId" element={<MyCollections />} />
+      <Route path="/update-store/:id" element={<UpdateStore />} />
+      <Route
+        path="/store/:storeId/create-product"
+        element={<CreateProduct />}
+      />
+      <Route path="/product/:productId" element={<Product />} />
+      <Route path="/create-collection" element={<CreateCollection />} />
+      <Route
+        path="/update-collection/:collectionId"
+        element={<UpdateCollection />}
+      />
+      <Route path="/update-product/:productId" element={<UpdateProduct />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/my-products" element={<MyProducts />} />
       {/* </Route> */}
       <Route path="*" element={<div>404 - Page Not Found</div>} />
     </Routes>

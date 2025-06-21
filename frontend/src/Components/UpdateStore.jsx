@@ -1,124 +1,125 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../Layouts/Header';
-import Footer from '../Layouts/Footer';
-import { FaArrowLeft } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import Header from "../Layouts/Header";
+import Footer from "../Layouts/Footer";
+import { FaArrowLeft } from "react-icons/fa";
 
 const UpdateStore = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    slogan: '',
+    name: "",
+    description: "",
+    slogan: "",
     bannerImage: null,
     featuredImage: null,
     logo: null,
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     fetchStore();
   }, [id]);
 
   const fetchStore = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      setError('Please connect your wallet.');
+      setError("Please connect your wallet.");
       return;
     }
     try {
       const response = await fetch(`http://localhost:3000/stores/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-        credentials: 'include',
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
-      if (!response.ok) throw new Error('Failed to fetch store');
+      if (!response.ok) throw new Error("Failed to fetch store");
       const data = await response.json();
       setFormData({
-        name: data.name || '',
-        description: data.description || '',
-        slogan: data.slogan || '',
+        name: data.name || "",
+        description: data.description || "",
+        slogan: data.slogan || "",
         bannerImage: null,
         featuredImage: null,
         logo: null,
       });
     } catch (err) {
-      console.error('Fetch error:', err.message);
+      console.error("Fetch error:", err.message);
       setError(err.message);
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
     const { name } = e.target;
-    setFormData(prev => ({ ...prev, [name]: e.target.files[0] }));
+    setFormData((prev) => ({ ...prev, [name]: e.target.files[0] }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      setError('Please connect your wallet.');
+      setError("Please connect your wallet.");
       return;
     }
     const form = new FormData();
-    form.append('name', formData.name);
-    form.append('description', formData.description);
-    form.append('slogan', formData.slogan);
-    if (formData.bannerImage) form.append('bannerImage', formData.bannerImage);
-    if (formData.featuredImage) form.append('featuredImage', formData.featuredImage);
-    if (formData.logo) form.append('logo', formData.logo);
+    form.append("name", formData.name);
+    form.append("description", formData.description);
+    form.append("slogan", formData.slogan);
+    if (formData.bannerImage) form.append("bannerImage", formData.bannerImage);
+    if (formData.featuredImage)
+      form.append("featuredImage", formData.featuredImage);
+    if (formData.logo) form.append("logo", formData.logo);
 
     try {
       const response = await fetch(`http://localhost:3000/stores/${id}`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` },
-        credentials: 'include',
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
         body: form,
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update store');
+        throw new Error(errorData.message || "Failed to update store");
       }
-      setSuccess('Store updated successfully!');
-      setError('');
+      setSuccess("Store updated successfully!");
+      setError("");
       setTimeout(() => navigate(`/store/${id}`), 2000);
     } catch (err) {
-      console.error('Update error:', err.message);
+      console.error("Update error:", err.message);
       setError(err.message);
-      setSuccess('');
+      setSuccess("");
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this store?')) return;
-    const token = localStorage.getItem('token');
+    if (!window.confirm("Are you sure you want to delete this store?")) return;
+    const token = localStorage.getItem("token");
     if (!token) {
-      setError('Please connect your wallet.');
+      setError("Please connect your wallet.");
       return;
     }
     try {
       const response = await fetch(`http://localhost:3000/stores/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-        credentials: 'include',
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete store');
+        throw new Error(errorData.message || "Failed to delete store");
       }
-      setSuccess('Store deleted successfully!');
-      setError('');
-      setTimeout(() => navigate('/profile'), 2000);
+      setSuccess("Store deleted successfully!");
+      setError("");
+      setTimeout(() => navigate("/profile"), 2000);
     } catch (err) {
-      console.error('Delete error:', err.message);
+      console.error("Delete error:", err.message);
       setError(err.message);
-      setSuccess('');
+      setSuccess("");
     }
   };
 
@@ -166,7 +167,9 @@ const UpdateStore = () => {
             />
           </div>
           <div className="mb-8">
-            <label className="block text-gray-700 font-medium mb-3">Slogan</label>
+            <label className="block text-gray-700 font-medium mb-3">
+              Slogan
+            </label>
             <input
               type="text"
               name="slogan"

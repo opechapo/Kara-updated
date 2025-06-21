@@ -17,7 +17,7 @@ contract Escrow {
         require(_seller != address(0), "Invalid seller address");
         buyer = msg.sender;
         seller = _seller;
-        commission = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
+        commission = 0xE51b3af8B69836b329F3F4c70964BbAa84d5B2Ad;
         amount = msg.value;
         require(amount > 0, "Amount must be greater than 0");
         emit FundsDeposited(buyer, amount);

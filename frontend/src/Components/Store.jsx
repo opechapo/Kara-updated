@@ -275,7 +275,7 @@ const Store = () => {
               <div className="mb-10">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Collections</h3>
                 {collections.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {collections.map((collection) => (
                       <div
                         key={collection._id}
@@ -315,7 +315,7 @@ const Store = () => {
               <div className="mb-20">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Products</h3>
                 {products.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {products.map((product) => (
                       <div
                         key={product._id}
