@@ -461,7 +461,7 @@ const LandingPage = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-600">No Homes & Gardens items available.</p>
+              <p className="text-gray-600">No Homes & Gardens items available</p>
             )}
           </div>
           {homeGardenItems.length > 5 && (
